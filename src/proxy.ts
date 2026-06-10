@@ -1,4 +1,3 @@
-import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -8,21 +7,22 @@ const PUBLIC_PATHS = [
   '/reset-password',
   '/invite',
   '/api/auth',
+  '/api/health',
 ]
 
-export default auth(async function proxy(req) {
-  const { nextUrl, auth: session } = req as any
-  const pathname: string = nextUrl.pathname
+export function proxy(req: NextRequest) {
+  const { nextUrl } = req
+  const pathname = nextUrl.pathname
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
 
-  if (!isPublic && !session) {
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
+  // Check for NextAuth session cookie
+  const sessionCookie =
+    req.cookies.get('authjs.session-token') ||
+    req.cookies.get('__Secure-authjs.session-token')
 
-  // Admin guard
-  if (pathname.startsWith('/admin') && session?.user?.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/', req.url))
+  if (!isPublic && !sessionCookie) {
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
   // Cron guard
@@ -34,8 +34,8 @@ export default auth(async function proxy(req) {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|public).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|icon).*)'],
 }
