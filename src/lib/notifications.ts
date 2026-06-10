@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import webpush from 'web-push'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -88,7 +89,7 @@ export async function sendNotification(payload: NotifyPayload) {
       if (err?.statusCode === 410) {
         await prisma.user.update({
           where: { id: payload.userId },
-          data:  { pushSubscription: null },
+          data:  { pushSubscription: Prisma.JsonNull },
         })
       }
       await prisma.notificationLog.create({
