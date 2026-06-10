@@ -15,6 +15,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
 
   return NextResponse.json({
     valid: true,
+    email: invitation.email ?? null,
     groupName: invitation.group?.name ?? null,
   })
 }
@@ -22,9 +23,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
   const body = await req.json()
-  const { username, email, password } = body
+  const { username, password } = body
 
-  if (!username || !email || !password) {
+  if (!username || !password) {
     return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 })
   }
   if (password.length < 8) {
@@ -34,6 +35,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   const invitation = await prisma.invitation.findUnique({ where: { token } })
   if (!invitation || invitation.usedAt || invitation.expiresAt < new Date()) {
     return NextResponse.json({ error: 'Invitation invalide ou expirée' }, { status: 410 })
+  }
+
+  // Use the email stored in the invitation (not from client)
+  const email = invitation.email
+  if (!email) {
+    return NextResponse.json({ error: 'Email manquant dans l\'invitation' }, { status: 400 })
   }
 
   const existing = await prisma.user.findFirst({

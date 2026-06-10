@@ -37,6 +37,7 @@ export default function InvitePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
+        // email is read from the invitation server-side
       })
       if (!res.ok) {
         const data = await res.json()
