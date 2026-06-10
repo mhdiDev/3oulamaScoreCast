@@ -39,7 +39,6 @@ services:
     name: sync-scores
     runtime: node
     region: frankfurt
-    plan: free
     schedule: "*/2 * * * *"
     buildCommand: echo "no build"
     startCommand: >
@@ -55,7 +54,6 @@ services:
     name: reminders
     runtime: node
     region: frankfurt
-    plan: free
     schedule: "*/5 * * * *"
     buildCommand: echo "no build"
     startCommand: >
