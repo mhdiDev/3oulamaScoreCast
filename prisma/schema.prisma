@@ -164,6 +164,7 @@ model ScoringRule {
 }
 
 model LeaderboardSnapshot {
+  id             String   @id @default(uuid())
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   group          Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -175,7 +176,7 @@ model LeaderboardSnapshot {
   rank           Int
   computedAt     DateTime @default(now())
 
-  @@id([userId, groupId])
+  @@unique([userId, groupId])
 }
 
 model NotificationLog {
