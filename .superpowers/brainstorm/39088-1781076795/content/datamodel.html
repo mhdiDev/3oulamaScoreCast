@@ -1,0 +1,124 @@
+<h2>Schéma de base de données</h2>
+<p class="subtitle">PostgreSQL · 8 tables principales</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.5rem">
+
+  <!-- User -->
+  <div style="background:var(--surface);border:2px solid #60a5fa;border-radius:10px;padding:1rem">
+    <div class="label" style="color:#60a5fa">USER</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id, email, username, passwordHash</li>
+      <li>avatarUrl, locale (fr/en)</li>
+      <li>role: USER | ADMIN</li>
+      <li>emailNotifications: boolean</li>
+      <li>pushSubscription: json</li>
+      <li>createdAt</li>
+    </ul>
+  </div>
+
+  <!-- Invitation -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#a78bfa">INVITATION</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id, token (unique, UUID)</li>
+      <li>createdBy → User</li>
+      <li>usedBy → User (nullable)</li>
+      <li>expiresAt, usedAt</li>
+    </ul>
+  </div>
+
+  <!-- Team -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#34d399">TEAM</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id, name, code (ex. FRA)</li>
+      <li>flagUrl, group (A–L)</li>
+      <li>fifaRanking</li>
+      <li><em>48 équipes pré-seedées</em></li>
+    </ul>
+  </div>
+
+  <!-- Match -->
+  <div style="background:var(--surface);border:2px solid #34d399;border-radius:10px;padding:1rem">
+    <div class="label" style="color:#34d399">MATCH</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id, externalId (API football)</li>
+      <li>homeTeam → Team, awayTeam → Team</li>
+      <li>kickoffAt (UTC)</li>
+      <li>stage: GROUP | R32 | QF | SF | FINAL</li>
+      <li>group (A–L, nullable)</li>
+      <li>stadium, city</li>
+      <li>homeScore, awayScore (nullable)</li>
+      <li>status: SCHEDULED | LIVE | FINISHED</li>
+      <li>cutoffAt = kickoffAt − 5min</li>
+    </ul>
+  </div>
+
+  <!-- Prediction -->
+  <div style="background:var(--surface);border:2px solid #f59e0b;border-radius:10px;padding:1rem">
+    <div class="label" style="color:#f59e0b">PREDICTION</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id</li>
+      <li>user → User</li>
+      <li>match → Match</li>
+      <li>homeScore, awayScore</li>
+      <li>points (calculé après match)</li>
+      <li>updatedAt</li>
+      <li><em>UNIQUE(userId, matchId)</em></li>
+    </ul>
+  </div>
+
+  <!-- ScoringRule -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#f472b6">SCORING_RULE</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id</li>
+      <li>exactScore: int (défaut: 3)</li>
+      <li>correctResult: int (défaut: 1)</li>
+      <li>wrongPrediction: int (défaut: 0)</li>
+      <li>bonusKnockout: int (défaut: 0)</li>
+      <li>updatedAt, updatedBy → User</li>
+    </ul>
+  </div>
+
+  <!-- Leaderboard (vue matérialisée) -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#60a5fa">LEADERBOARD_SNAPSHOT</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>userId → User</li>
+      <li>totalPoints</li>
+      <li>exactScores (count)</li>
+      <li>correctResults (count)</li>
+      <li>currentStreak</li>
+      <li>rank, computedAt</li>
+    </ul>
+  </div>
+
+  <!-- Notification Log -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#a78bfa">NOTIFICATION_LOG</div>
+    <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0">
+      <li>id, userId → User</li>
+      <li>type: REMINDER | RESULT</li>
+      <li>channel: EMAIL | PUSH</li>
+      <li>matchId → Match</li>
+      <li>sentAt, status</li>
+    </ul>
+  </div>
+
+</div>
+
+<div style="margin-top:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+  <div class="label">RELATIONS CLÉS</div>
+  <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:0.8rem">
+    <span>User 1→N Prediction</span>
+    <span style="color:var(--border)">·</span>
+    <span>Match 1→N Prediction</span>
+    <span style="color:var(--border)">·</span>
+    <span>Match N→1 Team (×2)</span>
+    <span style="color:var(--border)">·</span>
+    <span>User 1→1 LeaderboardSnapshot</span>
+    <span style="color:var(--border)">·</span>
+    <span>ScoringRule = 1 ligne active</span>
+  </div>
+</div>

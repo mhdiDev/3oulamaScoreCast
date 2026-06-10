@@ -1,0 +1,85 @@
+<h2>Pages & navigation</h2>
+<p class="subtitle">Structure des écrans — mobile-first, FR par défaut</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.5rem">
+
+  <!-- Auth -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#a78bfa">AUTH (public)</div>
+    <ul style="font-size:0.83rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0;line-height:1.8">
+      <li><code>/invite/[token]</code> — page d'inscription via lien</li>
+      <li><code>/login</code> — connexion email/mdp</li>
+      <li><code>/forgot-password</code> — reset par email</li>
+      <li><code>/reset-password/[token]</code></li>
+    </ul>
+  </div>
+
+  <!-- App principale -->
+  <div style="background:var(--surface);border:2px solid #60a5fa;border-radius:10px;padding:1rem">
+    <div class="label" style="color:#60a5fa">APP (authentifié)</div>
+    <ul style="font-size:0.83rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0;line-height:1.8">
+      <li><code>/</code> — Dashboard : prochains matchs + mon classement</li>
+      <li><code>/matches</code> — Calendrier complet par phase</li>
+      <li><code>/matches/[id]</code> — Détail match + saisie pronostic</li>
+      <li><code>/leaderboard</code> — Classement général + par journée</li>
+      <li><code>/profile</code> — Avatar, pseudo, préfs notifs</li>
+      <li><code>/rules</code> — Barème et règles du jeu</li>
+    </ul>
+  </div>
+
+  <!-- Admin -->
+  <div style="background:var(--surface);border:2px solid #f59e0b;border-radius:10px;padding:1rem">
+    <div class="label" style="color:#f59e0b">ADMIN</div>
+    <ul style="font-size:0.83rem;color:var(--text-muted);padding-left:1rem;margin:0.5rem 0 0;line-height:1.8">
+      <li><code>/admin</code> — Dashboard admin</li>
+      <li><code>/admin/invitations</code> — Générer/révoquer liens</li>
+      <li><code>/admin/users</code> — Liste users, désactiver compte</li>
+      <li><code>/admin/scoring</code> — Configurer barème</li>
+      <li><code>/admin/matches</code> — Forcer correction d'un score</li>
+    </ul>
+  </div>
+
+  <!-- Navigation mobile -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+    <div class="label" style="color:#34d399">NAVIGATION</div>
+    <div style="font-size:0.83rem;color:var(--text-muted);margin-top:0.5rem">
+      <p style="margin:0 0 0.5rem"><strong>Desktop :</strong> sidebar gauche fixe</p>
+      <p style="margin:0 0 0.5rem"><strong>Mobile :</strong> bottom tab bar (4 onglets)</p>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem">
+        <span style="background:#1e3a5f;padding:0.25rem 0.6rem;border-radius:6px;font-size:0.78rem">🏠 Accueil</span>
+        <span style="background:#1e3a5f;padding:0.25rem 0.6rem;border-radius:6px;font-size:0.78rem">📅 Matchs</span>
+        <span style="background:#1e3a5f;padding:0.25rem 0.6rem;border-radius:6px;font-size:0.78rem">🏆 Classement</span>
+        <span style="background:#1e3a5f;padding:0.25rem 0.6rem;border-radius:6px;font-size:0.78rem">👤 Profil</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- API Routes -->
+<div style="margin-top:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+  <div class="label">API ROUTES PRINCIPALES</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.8rem;font-size:0.8rem;color:var(--text-muted)">
+    <div><code style="color:#60a5fa">POST</code> /api/auth/[...nextauth]</div>
+    <div><code style="color:#60a5fa">POST</code> /api/auth/invite/[token]</div>
+    <div><code style="color:#34d399">GET</code> /api/matches</div>
+    <div><code style="color:#34d399">GET</code> /api/matches/[id]</div>
+    <div><code style="color:#60a5fa">POST/PUT</code> /api/predictions/[matchId]</div>
+    <div><code style="color:#34d399">GET</code> /api/predictions/me</div>
+    <div><code style="color:#34d399">GET</code> /api/leaderboard</div>
+    <div><code style="color:#34d399">GET</code> /api/leaderboard/match/[id]</div>
+    <div><code style="color:#f59e0b">POST</code> /api/admin/scoring</div>
+    <div><code style="color:#f59e0b">POST</code> /api/admin/invitations</div>
+    <div><code style="color:#f59e0b">PATCH</code> /api/admin/matches/[id]</div>
+    <div><code style="color:#f59e0b">GET/DELETE</code> /api/admin/users/[id]</div>
+  </div>
+</div>
+
+<!-- Cron -->
+<div style="margin-top:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+  <div class="label">CRON JOBS (Railway Cron)</div>
+  <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem">
+    <div>⚽ <strong>Sync scores</strong> — toutes les 2 min pendant matchs LIVE → calcul points → push leaderboard</div>
+    <div>🔔 <strong>Rappels pronostics</strong> — 24h et 1h avant chaque match → email/push si pronostic manquant</div>
+  </div>
+</div>

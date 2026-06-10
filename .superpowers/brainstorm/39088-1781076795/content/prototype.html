@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3oulama ScoreCast — Prototype interactif</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pitch-950:#020d1a;--pitch-900:#041629;--pitch-800:#0a2540;--pitch-700:#0e3460;
+  --pitch-600:#154d8f;--pitch-500:#1a65c0;--pitch-400:#3b82f6;--pitch-300:#93c5fd;
+  --gold-400:#f59e0b;--gold-300:#fbbf24;--gold-200:#fde68a;
+  --grass-400:#22c55e;--grass-300:#4ade80;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --border:#334155;--surface:#1e293b;
+  --radius:12px;--radius-sm:8px;--radius-full:9999px;
+  --trans:all 0.2s cubic-bezier(0,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#111827;font-family:'Inter',sans-serif;color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem}
+
+/* ── Frame wrapper ── */
+h1{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.25rem;text-align:center}
+.subtitle{color:var(--text-muted);font-size:0.85rem;text-align:center;margin-bottom:2rem}
+
+/* ── Device frames ── */
+.frames{display:flex;gap:2.5rem;align-items:flex-start;flex-wrap:wrap;justify-content:center;width:100%;max-width:1100px}
+
+.phone-frame{width:320px;background:var(--pitch-950);border-radius:32px;border:2px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.03);overflow:hidden;flex-shrink:0}
+.phone-notch{height:32px;background:var(--pitch-950);display:flex;align-items:center;justify-content:center}
+.phone-notch-pill{width:80px;height:10px;background:#1e293b;border-radius:99px}
+.phone-screen{min-height:580px;position:relative;overflow:hidden}
+
+.desktop-frame{flex:1;min-width:500px;max-width:680px;background:var(--pitch-950);border-radius:16px;border:2px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,0.8);overflow:hidden}
+.desktop-chrome{height:36px;background:#0a2540;display:flex;align-items:center;gap:0.5rem;padding:0 1rem;border-bottom:1px solid var(--border)}
+.chrome-dot{width:10px;height:10px;border-radius:50%}
+.chrome-bar{flex:1;background:#1e293b;border-radius:6px;height:18px;margin:0 0.75rem;display:flex;align-items:center;padding:0 0.75rem;font-size:0.65rem;color:var(--text-muted)}
+
+/* ── Nav tabs ── */
+.nav-tabs{display:flex;gap:0.5rem;padding:0.75rem;background:var(--pitch-900);border-bottom:1px solid var(--border)}
+.nav-tab{flex:1;background:none;border:none;color:var(--text-muted);font-size:0.7rem;cursor:pointer;padding:0.4rem 0.25rem;border-radius:8px;font-family:'Inter',sans-serif;transition:var(--trans);text-align:center}
+.nav-tab.active{background:var(--pitch-700);color:var(--text-primary)}
+.nav-tab:hover:not(.active){background:var(--pitch-800);color:var(--text-secondary)}
+
+/* ── Screens ── */
+.screen{display:none;padding:1rem;animation:fadeIn 0.2s ease-out}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Components ── */
+.card{background:var(--pitch-800);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem}
+.card-sm{background:var(--pitch-800);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.65rem 0.75rem;margin-bottom:0.4rem}
+.section-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem}
+.badge{display:inline-flex;align-items:center;gap:0.25rem;padding:0.15rem 0.5rem;border-radius:var(--radius-full);font-size:0.65rem;font-weight:600}
+.badge-live{background:#7f1d1d;color:#fca5a5}
+.badge-upcoming{background:#1c3451;color:#93c5fd}
+.badge-exact{background:#451a03;color:#fde68a}
+.badge-correct{background:#1c3326;color:#86efac}
+.btn{border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:var(--trans)}
+.btn-primary{background:var(--pitch-600);color:white;padding:0.55rem 1.1rem;font-size:0.8rem}
+.btn-primary:hover{background:var(--pitch-500)}
+.btn-gold{background:var(--gold-400);color:var(--pitch-950);padding:0.55rem 1.1rem;font-size:0.8rem;font-weight:700}
+.btn-gold:hover{background:var(--gold-300)}
+.btn-sm{padding:0.3rem 0.65rem;font-size:0.7rem}
+.rank-row{display:flex;align-items:center;gap:0.6rem;background:var(--pitch-800);border-radius:var(--radius-sm);padding:0.5rem 0.75rem;margin-bottom:0.35rem;transition:var(--trans)}
+.rank-row:hover{background:var(--pitch-700)}
+.rank-row.me{border:1px solid var(--pitch-400);background:#0d2144}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.65rem;flex-shrink:0}
+
+/* ── Score counter ── */
+.score-wrap{display:flex;align-items:center;justify-content:center;gap:2rem;padding:0.75rem 0}
+.score-col{display:flex;flex-direction:column;align-items:center;gap:0.4rem}
+.score-btn{width:32px;height:28px;background:var(--pitch-700);border:1px solid var(--border);border-radius:6px;color:white;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:var(--trans)}
+.score-btn:hover{background:var(--pitch-600)}
+.score-btn:disabled{opacity:0.3;cursor:not-allowed}
+.score-val{background:var(--pitch-900);border-radius:8px;padding:0.35rem 0.9rem;font-size:1.6rem;font-weight:800;min-width:50px;text-align:center;tabular-nums}
+
+/* ── Progress ── */
+.progress{background:#1e293b;border-radius:99px;height:5px;overflow:hidden;margin-top:0.35rem}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pitch-600),var(--pitch-400));transition:width 0.4s ease}
+
+/* ── Bottom bar ── */
+.bottombar{display:flex;background:var(--pitch-900);border-top:1px solid var(--border);padding:0.5rem 0}
+.bottombar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.15rem;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.6rem;font-family:'Inter',sans-serif;padding:0.3rem;transition:var(--trans);border-radius:8px}
+.bottombar-btn.active{color:var(--pitch-400)}
+.bottombar-btn:hover{color:var(--text-secondary)}
+.bottombar-icon{font-size:1.1rem}
+
+/* ── Desktop sidebar ── */
+.desktop-layout{display:flex;min-height:520px}
+.sidebar{width:200px;background:var(--pitch-900);border-right:1px solid var(--border);padding:1rem 0.75rem;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.5rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:0.75rem}
+.sidebar-logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--pitch-600),var(--pitch-400));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.sidebar-nav-item{display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.5rem;border-radius:var(--radius-sm);font-size:0.78rem;cursor:pointer;color:var(--text-muted);margin-bottom:0.15rem;transition:var(--trans)}
+.sidebar-nav-item.active{background:var(--pitch-700);color:var(--text-primary)}
+.sidebar-nav-item:hover:not(.active){background:var(--pitch-800);color:var(--text-secondary)}
+.desktop-content{flex:1;padding:1.25rem;overflow:auto}
+
+/* ── Match card ── */
+.match-card{background:var(--pitch-800);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;margin-bottom:0.5rem;cursor:pointer;transition:var(--trans)}
+.match-card:hover{border-color:var(--pitch-500);background:var(--pitch-700)}
+.match-teams{display:flex;align-items:center;justify-content:space-between;gap:0.5rem}
+.team-info{display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:600}
+.team-score{font-size:1.1rem;font-weight:800;color:var(--gold-300);min-width:20px;text-align:center}
+
+/* ── Admin ── */
+.admin-stat{background:var(--pitch-800);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;text-align:center}
+.admin-stat-val{font-size:1.6rem;font-weight:800;color:var(--gold-300)}
+.admin-stat-label{font-size:0.7rem;color:var(--text-muted);margin-top:0.1rem}
+.table{width:100%;font-size:0.78rem;border-collapse:separate;border-spacing:0 0.3rem}
+.table th{color:var(--text-muted);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;padding:0 0.5rem 0.35rem;text-align:left}
+.table td{padding:0.5rem;background:var(--pitch-800)}
+.table tr td:first-child{border-radius:8px 0 0 8px}
+.table tr td:last-child{border-radius:0 8px 8px 0}
+
+/* ── Group filter tabs ── */
+.group-tabs{display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.75rem}
+.group-tab{background:var(--pitch-800);border:1px solid var(--border);border-radius:var(--radius-full);padding:0.25rem 0.7rem;font-size:0.72rem;cursor:pointer;color:var(--text-secondary);transition:var(--trans)}
+.group-tab.active{background:var(--pitch-600);color:white;border-color:var(--pitch-500)}
+.group-tab:hover:not(.active){border-color:var(--pitch-500);color:var(--text-primary)}
+</style>
+</head>
+<body>
+
+<h1>⚽ 3oulama ScoreCast</h1>
+<p class="subtitle">Prototype interactif — Coupe du Monde 2026 · Navigue entre les écrans</p>
+
+<div class="frames">
+
+  <!-- ═══════════════════════════════
+       MOBILE FRAME
+  ═══════════════════════════════ -->
+  <div class="phone-frame">
+    <div class="phone-notch"><div class="phone-notch-pill"></div></div>
+
+    <!-- Nav tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showScreen('dashboard',this,'mobile')">🏠 Accueil</button>
+      <button class="nav-tab" onclick="showScreen('matches',this,'mobile')">📅 Matchs</button>
+      <button class="nav-tab" onclick="showScreen('predict',this,'mobile')">⚽ Pronostic</button>
+      <button class="nav-tab" onclick="showScreen('ranking',this,'mobile')">🏆 Classement</button>
+    </div>
+
+    <div class="phone-screen">
+
+      <!-- DASHBOARD -->
+      <div id="mobile-dashboard" class="screen active">
+        <div style="background:linear-gradient(135deg,var(--pitch-700),var(--pitch-600));border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;position:relative;overflow:hidden">
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em">Ton rang</div>
+          <div style="font-size:1.8rem;font-weight:800;line-height:1.1;margin:0.2rem 0">🥈 2ème</div>
+          <div style="font-size:1rem;color:var(--gold-300);font-weight:700">47 points</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-top:0.25rem">Groupe : Les Frères · 5 scores exacts</div>
+          <div style="position:absolute;right:-10px;top:-10px;font-size:4rem;opacity:0.08">🏆</div>
+        </div>
+
+        <div class="section-label">Prochains matchs</div>
+
+        <div class="match-card" onclick="showScreen('predict',document.querySelectorAll('.nav-tab')[2],'mobile')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+            <span class="badge badge-upcoming">🕐 Auj. 21h00</span>
+            <span style="font-size:0.65rem;color:var(--text-muted)">Groupe A · Los Angeles</span>
+          </div>
+          <div class="match-teams">
+            <div class="team-info"><span>🇫🇷</span><span>France</span></div>
+            <button class="btn btn-gold btn-sm">Pronostiquer</button>
+            <div class="team-info"><span>Maroc</span><span>🇲🇦</span></div>
+          </div>
+        </div>
+
+        <div class="match-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+            <span class="badge badge-upcoming">🕐 Dem. 18h00</span>
+            <span style="font-size:0.65rem;color:var(--text-muted)">Groupe B · Miami</span>
+          </div>
+          <div class="match-teams">
+            <div class="team-info"><span>🇧🇷</span><span>Brésil</span></div>
+            <div style="background:var(--pitch-900);border-radius:6px;padding:0.2rem 0.5rem;font-size:0.75rem;color:var(--pitch-300)">2 — 1 ✓</div>
+            <div class="team-info"><span>Argentine</span><span>🇦🇷</span></div>
+          </div>
+        </div>
+
+        <div class="match-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+            <span class="badge badge-live">● LIVE 67'</span>
+            <span style="font-size:0.65rem;color:var(--text-muted)">Groupe C · NY</span>
+          </div>
+          <div class="match-teams">
+            <div class="team-info"><span>🇩🇪</span><span>Allemagne</span></div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--gold-300)">1 — 0</div>
+            <div class="team-info"><span>Espagne</span><span>🇪🇸</span></div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:0.75rem">Mes stats</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
+          <div class="card" style="text-align:center;padding:0.6rem">
+            <div style="font-size:1.1rem;font-weight:800;color:var(--gold-300)">5</div>
+            <div style="font-size:0.62rem;color:var(--text-muted)">Exacts ⚽</div>
+          </div>
+          <div class="card" style="text-align:center;padding:0.6rem">
+            <div style="font-size:1.1rem;font-weight:800;color:var(--grass-400)">12</div>
+            <div style="font-size:0.62rem;color:var(--text-muted)">Bons résul.</div>
+          </div>
+          <div class="card" style="text-align:center;padding:0.6rem">
+            <div style="font-size:1.1rem;font-weight:800;color:var(--pitch-300)">🔥3</div>
+            <div style="font-size:0.62rem;color:var(--text-muted)">Série</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHES -->
+      <div id="mobile-matches" class="screen">
+        <div style="display:flex;gap:0.35rem;margin-bottom:0.75rem;flex-wrap:wrap">
+          <button class="group-tab active">Tous</button>
+          <button class="group-tab" onclick="filterGroup(this,'A')">Gr. A</button>
+          <button class="group-tab" onclick="filterGroup(this,'B')">Gr. B</button>
+          <button class="group-tab" onclick="filterGroup(this,'QF')">QF</button>
+          <button class="group-tab" onclick="filterGroup(this,'SF')">SF</button>
+          <button class="group-tab" onclick="filterGroup(this,'F')">Finale</button>
+        </div>
+
+        <div class="section-label">Aujourd'hui · 11 Juin 2026</div>
+        <div class="match-card" onclick="showScreen('predict',document.querySelectorAll('.nav-tab')[2],'mobile')">
+          <div class="match-teams">
+            <div class="team-info"><span>🇫🇷</span><span>France</span></div>
+            <div style="text-align:center">
+              <div style="font-size:0.62rem;color:var(--text-muted)">21:00</div>
+              <button class="btn btn-gold btn-sm" style="margin-top:0.15rem">Pronostiquer</button>
+            </div>
+            <div class="team-info"><span>Maroc</span><span>🇲🇦</span></div>
+          </div>
+        </div>
+        <div class="match-card">
+          <div class="match-teams">
+            <div class="team-info"><span>🇩🇪</span><span>Allemagne</span></div>
+            <div style="text-align:center">
+              <span class="badge badge-live" style="display:block;margin-bottom:0.15rem">● LIVE 67'</span>
+              <div style="font-size:1rem;font-weight:800;color:var(--gold-300)">1 — 0</div>
+            </div>
+            <div class="team-info"><span>Espagne</span><span>🇪🇸</span></div>
+          </div>
+          <div style="background:var(--pitch-900);border-radius:6px;padding:0.35rem 0.5rem;margin-top:0.4rem;font-size:0.68rem;color:var(--pitch-300)">
+            Ton pronostic : <strong>1-1</strong> · <span class="badge badge-correct" style="font-size:0.62rem">En cours…</span>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:0.5rem">Hier · 10 Juin 2026</div>
+        <div class="match-card">
+          <div class="match-teams">
+            <div class="team-info"><span>🇧🇷</span><span>Brésil</span></div>
+            <div style="text-align:center">
+              <div style="font-size:1rem;font-weight:800;color:var(--gold-300)">2 — 1</div>
+              <span class="badge badge-exact" style="font-size:0.6rem">🏆 Score exact</span>
+            </div>
+            <div class="team-info"><span>Argentine</span><span>🇦🇷</span></div>
+          </div>
+          <div style="background:var(--pitch-900);border-radius:6px;padding:0.35rem 0.5rem;margin-top:0.4rem;font-size:0.68rem;color:var(--gold-200)">
+            Ton pronostic : <strong>2-1</strong> · +3 pts 🏆
+          </div>
+        </div>
+      </div>
+
+      <!-- PREDICTION -->
+      <div id="mobile-predict" class="screen">
+        <div style="text-align:center;margin-bottom:0.75rem">
+          <span class="badge badge-upcoming">🕐 Auj. 21h00</span>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.25rem">Groupe A · SoFi Stadium, Los Angeles</div>
+        </div>
+
+        <div class="card" style="text-align:center">
+          <div class="match-teams" style="justify-content:center;gap:2rem;margin-bottom:0.5rem">
+            <div style="text-align:center"><div style="font-size:1.8rem">🇫🇷</div><div style="font-size:0.8rem;font-weight:600;margin-top:0.25rem">France</div></div>
+            <div style="font-size:0.9rem;color:var(--text-muted)">vs</div>
+            <div style="text-align:center"><div style="font-size:1.8rem">🇲🇦</div><div style="font-size:0.8rem;font-weight:600;margin-top:0.25rem">Maroc</div></div>
+          </div>
+
+          <div class="score-wrap">
+            <div class="score-col">
+              <button class="score-btn" onclick="changeScore('home',1)">+</button>
+              <div class="score-val" id="score-home">2</div>
+              <button class="score-btn" onclick="changeScore('home',-1)">−</button>
+            </div>
+            <div style="font-size:1.5rem;color:var(--text-muted);font-weight:300;padding-bottom:0.5rem">—</div>
+            <div class="score-col">
+              <button class="score-btn" onclick="changeScore('away',1)">+</button>
+              <div class="score-val" id="score-away">1</div>
+              <button class="score-btn" onclick="changeScore('away',-1)">−</button>
+            </div>
+          </div>
+
+          <div id="predict-result" style="background:var(--pitch-900);border-radius:8px;padding:0.5rem;margin-bottom:0.6rem;font-size:0.75rem;color:var(--pitch-300)">
+            🏆 Victoire France — <span style="color:var(--text-muted)">Valeur : 1–3 pts selon le barème</span>
+          </div>
+
+          <button class="btn btn-gold" style="width:100%;padding:0.7rem" onclick="confirmPrediction()">
+            ✓ Confirmer le pronostic
+          </button>
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-top:0.4rem">⏱ Coupure dans <strong style="color:var(--gold-300)">3h 42min</strong></div>
+        </div>
+
+        <div id="confirm-msg" style="display:none;background:#1c3326;border:1px solid var(--grass-400);border-radius:var(--radius);padding:0.75rem;text-align:center;font-size:0.82rem;color:var(--grass-300);margin-top:0.5rem">
+          ✅ Pronostic enregistré ! France 2 — 1 Maroc
+        </div>
+      </div>
+
+      <!-- RANKING -->
+      <div id="mobile-ranking" class="screen">
+        <div class="group-tabs">
+          <button class="group-tab active">Général</button>
+          <button class="group-tab">Les Frères</button>
+          <button class="group-tab">Bureau</button>
+        </div>
+
+        <div class="rank-row">
+          <span style="width:20px;text-align:center;font-size:1rem">🥇</span>
+          <div class="avatar" style="background:#1d4ed8">MK</div>
+          <span style="flex:1;font-size:0.82rem;font-weight:600">Mehdi</span>
+          <div style="text-align:right"><div style="font-size:0.85rem;font-weight:700;color:var(--gold-300)">54 pts</div><div style="font-size:0.65rem;color:var(--text-muted)">6 ⚽</div></div>
+        </div>
+        <div class="rank-row me">
+          <span style="width:20px;text-align:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">2</span>
+          <div class="avatar" style="background:#1e40af">Moi</div>
+          <span style="flex:1;font-size:0.82rem;font-weight:600;color:var(--pitch-300)">Toi <span style="font-size:0.65rem;color:var(--pitch-400)">(toi)</span></span>
+          <div style="text-align:right"><div style="font-size:0.85rem;font-weight:700;color:var(--gold-300)">47 pts</div><div style="font-size:0.65rem;color:var(--text-muted)">5 ⚽</div></div>
+        </div>
+        <div class="rank-row">
+          <span style="width:20px;text-align:center;font-size:1rem">🥉</span>
+          <div class="avatar" style="background:#374151">SA</div>
+          <span style="flex:1;font-size:0.82rem">Samir</span>
+          <div style="text-align:right"><div style="font-size:0.85rem;font-weight:700;color:var(--gold-300)">43 pts</div><div style="font-size:0.65rem;color:var(--text-muted)">4 ⚽</div></div>
+        </div>
+        <div class="rank-row">
+          <span style="width:20px;text-align:center;font-size:0.8rem;color:var(--text-muted);font-weight:700">4</span>
+          <div class="avatar" style="background:#374151">KL</div>
+          <span style="flex:1;font-size:0.82rem">Karim L.</span>
+          <div style="text-align:right"><div style="font-size:0.85rem;font-weight:700;color:var(--gold-300)">38 pts</div><div style="font-size:0.65rem;color:var(--text-muted)">3 ⚽</div></div>
+        </div>
+        <div class="rank-row">
+          <span style="width:20px;text-align:center;font-size:0.8rem;color:var(--text-muted);font-weight:700">5</span>
+          <div class="avatar" style="background:#374151">YB</div>
+          <span style="flex:1;font-size:0.82rem">Youssef B.</span>
+          <div style="text-align:right"><div style="font-size:0.85rem;font-weight:700;color:var(--gold-300)">31 pts</div><div style="font-size:0.65rem;color:var(--text-muted)">2 ⚽</div></div>
+        </div>
+
+        <div style="margin-top:0.75rem;background:var(--pitch-800);border-radius:var(--radius);padding:0.75rem">
+          <div class="section-label">Progression</div>
+          <div style="font-size:0.75rem;display:flex;justify-content:space-between;margin-bottom:0.25rem"><span>Pronostics</span><span style="color:var(--gold-300)">68 / 104</span></div>
+          <div class="progress"><div class="progress-fill" style="width:65%"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /phone-screen -->
+
+    <!-- Bottom bar -->
+    <div class="bottombar">
+      <button class="bottombar-btn active" onclick="showScreen('dashboard',this,'mobile-bottom')"><span class="bottombar-icon">🏠</span>Accueil</button>
+      <button class="bottombar-btn" onclick="showScreen('matches',this,'mobile-bottom')"><span class="bottombar-icon">📅</span>Matchs</button>
+      <button class="bottombar-btn" onclick="showScreen('predict',this,'mobile-bottom')"><span class="bottombar-icon">⚽</span>Pronostic</button>
+      <button class="bottombar-btn" onclick="showScreen('ranking',this,'mobile-bottom')"><span class="bottombar-icon">🏆</span>Classement</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+
+
+  <!-- ═══════════════════════════════
+       DESKTOP FRAME
+  ═══════════════════════════════ -->
+  <div class="desktop-frame">
+    <div class="desktop-chrome">
+      <div class="chrome-dot" style="background:#ef4444"></div>
+      <div class="chrome-dot" style="background:#f59e0b"></div>
+      <div class="chrome-dot" style="background:#22c55e"></div>
+      <div class="chrome-bar">🔒 scorecast.app/leaderboard</div>
+    </div>
+
+    <div class="desktop-layout">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚽</div>
+          <div><div style="font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:800">ScoreCast</div><div style="font-size:0.6rem;color:var(--text-muted)">CM 2026</div></div>
+        </div>
+        <div class="sidebar-nav-item" onclick="showDesktop('dash')">🏠 <span>Accueil</span></div>
+        <div class="sidebar-nav-item" onclick="showDesktop('matchs')">📅 <span>Matchs</span></div>
+        <div class="sidebar-nav-item active" onclick="showDesktop('classement')">🏆 <span>Classement</span></div>
+        <div class="sidebar-nav-item" onclick="showDesktop('admin')">⚙️ <span>Admin</span></div>
+        <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);margin-top:1rem">
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.5rem">
+            <div class="avatar" style="background:#1e40af;width:26px;height:26px;font-size:0.6rem">Moi</div>
+            <div><div style="font-size:0.72rem;font-weight:600">Toi</div><div style="font-size:0.6rem;color:var(--text-muted)">47 pts · #2</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="desktop-content">
+
+        <!-- CLASSEMENT (default) -->
+        <div id="desktop-classement" style="display:block">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div><div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800">Classement</div><div style="font-size:0.72rem;color:var(--text-muted)">Mis à jour il y a 2 min</div></div>
+          </div>
+          <div class="group-tabs">
+            <button class="group-tab active">🌍 Général</button>
+            <button class="group-tab">👥 Les Frères</button>
+            <button class="group-tab">💼 Bureau</button>
+          </div>
+          <div class="rank-row"><span style="width:24px;text-align:center;font-size:1rem">🥇</span><div class="avatar" style="background:#1d4ed8;width:32px;height:32px;font-size:0.72rem">MK</div><span style="flex:1;font-size:0.85rem;font-weight:600">Mehdi K.</span><div style="font-size:0.72rem;color:var(--text-muted);margin-right:1rem">🔥 Série ×3</div><div style="text-align:right"><div style="font-weight:700;color:var(--gold-300)">54 pts</div><div style="font-size:0.68rem;color:var(--text-muted)">6 exacts · 18 corrects</div></div></div>
+          <div class="rank-row me"><span style="width:24px;text-align:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">2</span><div class="avatar" style="background:#1e40af;width:32px;height:32px;font-size:0.72rem">Moi</div><span style="flex:1;font-size:0.85rem;font-weight:600;color:var(--pitch-300)">Toi <span style="font-size:0.7rem;color:var(--pitch-400)">(toi)</span></span><div style="font-size:0.72rem;color:var(--text-muted);margin-right:1rem">🔥 Série ×2</div><div style="text-align:right"><div style="font-weight:700;color:var(--gold-300)">47 pts</div><div style="font-size:0.68rem;color:var(--text-muted)">5 exacts · 14 corrects</div></div></div>
+          <div class="rank-row"><span style="width:24px;text-align:center;font-size:1rem">🥉</span><div class="avatar" style="background:#374151;width:32px;height:32px;font-size:0.72rem">SA</div><span style="flex:1;font-size:0.85rem">Samir A.</span><div style="font-size:0.72rem;color:var(--text-muted);margin-right:1rem"></div><div style="text-align:right"><div style="font-weight:700;color:var(--gold-300)">43 pts</div><div style="font-size:0.68rem;color:var(--text-muted)">4 exacts · 13 corrects</div></div></div>
+          <div class="rank-row"><span style="width:24px;text-align:center;font-size:0.8rem;color:var(--text-muted);font-weight:700">4</span><div class="avatar" style="background:#374151;width:32px;height:32px;font-size:0.72rem">KL</div><span style="flex:1;font-size:0.85rem">Karim L.</span><div style="margin-right:1rem"></div><div style="text-align:right"><div style="font-weight:700;color:var(--gold-300)">38 pts</div><div style="font-size:0.68rem;color:var(--text-muted)">3 exacts · 11 corrects</div></div></div>
+          <div class="rank-row"><span style="width:24px;text-align:center;font-size:0.8rem;color:var(--text-muted);font-weight:700">5</span><div class="avatar" style="background:#374151;width:32px;height:32px;font-size:0.72rem">YB</div><span style="flex:1;font-size:0.85rem">Youssef B.</span><div style="margin-right:1rem"></div><div style="text-align:right"><div style="font-weight:700;color:var(--gold-300)">31 pts</div><div style="font-size:0.68rem;color:var(--text-muted)">2 exacts · 9 corrects</div></div></div>
+        </div>
+
+        <!-- MATCHS -->
+        <div id="desktop-matchs" style="display:none">
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem">Calendrier des matchs</div>
+          <div class="section-label">Aujourd'hui · 11 Juin 2026</div>
+          <div class="match-card"><div class="match-teams"><div class="team-info"><span>🇫🇷</span><span>France</span></div><div style="text-align:center"><span class="badge badge-upcoming">🕐 21:00</span></div><div class="team-info"><span>Maroc</span><span>🇲🇦</span></div><button class="btn btn-gold btn-sm" style="margin-left:auto">Pronostiquer</button></div></div>
+          <div class="match-card"><div class="match-teams"><div class="team-info"><span>🇩🇪</span><span>Allemagne</span></div><div style="text-align:center"><span class="badge badge-live">● LIVE 67'</span><div style="font-weight:800;color:var(--gold-300);font-size:1rem">1 — 0</div></div><div class="team-info"><span>Espagne</span><span>🇪🇸</span></div><div style="margin-left:auto;font-size:0.72rem;color:var(--pitch-300)">Pronostic : 1-1</div></div></div>
+          <div class="section-label" style="margin-top:0.75rem">Hier</div>
+          <div class="match-card"><div class="match-teams"><div class="team-info"><span>🇧🇷</span><span>Brésil</span></div><div style="text-align:center"><div style="font-weight:800;color:var(--gold-300)">2 — 1</div><span class="badge badge-exact">🏆 Score exact</span></div><div class="team-info"><span>Argentine</span><span>🇦🇷</span></div><div style="margin-left:auto;font-size:0.72rem;color:var(--gold-200)">+3 pts</div></div></div>
+        </div>
+
+        <!-- ADMIN -->
+        <div id="desktop-admin" style="display:none">
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem">⚙️ Administration</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem">
+            <div class="admin-stat"><div class="admin-stat-val">12</div><div class="admin-stat-label">Utilisateurs</div></div>
+            <div class="admin-stat"><div class="admin-stat-val" style="color:var(--grass-400)">68</div><div class="admin-stat-label">Matchs finis</div></div>
+            <div class="admin-stat"><div class="admin-stat-val" style="color:var(--pitch-300)">3</div><div class="admin-stat-label">Groupes</div></div>
+          </div>
+
+          <div class="section-label">Barème actuel</div>
+          <div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;text-align:center">
+            <div><div style="font-size:1.3rem;font-weight:800;color:var(--gold-300)">3</div><div style="font-size:0.68rem;color:var(--text-muted)">Score exact</div></div>
+            <div><div style="font-size:1.3rem;font-weight:800;color:var(--grass-300)">1</div><div style="font-size:0.68rem;color:var(--text-muted)">Bon résultat</div></div>
+            <div><div style="font-size:1.3rem;font-weight:800;color:var(--text-muted)">0</div><div style="font-size:0.68rem;color:var(--text-muted)">Mauvais</div></div>
+          </div>
+
+          <div class="section-label" style="margin-top:0.75rem">Groupes</div>
+          <table class="table">
+            <thead><tr><th>Groupe</th><th>Membres</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>Les Frères</td><td>8</td><td><button class="btn btn-primary btn-sm">Inviter</button></td></tr>
+              <tr><td>Bureau</td><td>5</td><td><button class="btn btn-primary btn-sm">Inviter</button></td></tr>
+              <tr><td>Cousins</td><td>4</td><td><button class="btn btn-primary btn-sm">Inviter</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- DASH (desktop) -->
+        <div id="desktop-dash" style="display:none">
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:1rem">🏠 Accueil</div>
+          <div style="background:linear-gradient(135deg,var(--pitch-700),var(--pitch-600));border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem">
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em">Ton rang</div>
+            <div style="font-size:2rem;font-weight:800">🥈 2ème · <span style="color:var(--gold-300)">47 pts</span></div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);margin-top:0.25rem">5 scores exacts · Série 🔥×2</div>
+          </div>
+          <div class="section-label">Prochain match</div>
+          <div class="match-card"><div class="match-teams"><div class="team-info" style="font-size:0.95rem"><span style="font-size:1.3rem">🇫🇷</span><span>France</span></div><button class="btn btn-gold" onclick="showDesktop('matchs')">Pronostiquer maintenant</button><div class="team-info" style="font-size:0.95rem"><span>Maroc</span><span style="font-size:1.3rem">🇲🇦</span></div></div><div style="text-align:center;font-size:0.7rem;color:var(--text-muted);margin-top:0.4rem">⏱ Coupure dans 3h 42min</div></div>
+        </div>
+
+      </div><!-- /desktop-content -->
+    </div><!-- /desktop-layout -->
+  </div><!-- /desktop-frame -->
+
+</div><!-- /frames -->
+
+<script>
+let homeScore = 2, awayScore = 1
+
+function showScreen(name, el, ctx) {
+  // Update nav tabs
+  const container = el.closest('.nav-tabs') || el.closest('.bottombar')
+  if (container) {
+    container.querySelectorAll('button').forEach(b => b.classList.remove('active'))
+    el.classList.add('active')
+  }
+  // Show screen
+  ;['dashboard','matches','predict','ranking'].forEach(s => {
+    const sc = document.getElementById('mobile-' + s)
+    if (sc) sc.classList.toggle('active', s === name)
+  })
+  // Sync both navs
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    const map = ['dashboard','matches','predict','ranking']
+    t.classList.toggle('active', map[i] === name)
+  })
+  document.querySelectorAll('.bottombar-btn').forEach((t,i) => {
+    const map = ['dashboard','matches','predict','ranking']
+    t.classList.toggle('active', map[i] === name)
+  })
+}
+
+function showDesktop(name) {
+  ;['classement','matchs','admin','dash'].forEach(s => {
+    const el = document.getElementById('desktop-' + s)
+    if (el) el.style.display = s === name ? 'block' : 'none'
+  })
+  document.querySelectorAll('.sidebar-nav-item').forEach((item, i) => {
+    const map = ['dash','matchs','classement','admin']
+    item.classList.toggle('active', map[i] === name)
+  })
+  const urlMap = {dash:'scorecast.app', matchs:'scorecast.app/matches', classement:'scorecast.app/leaderboard', admin:'scorecast.app/admin'}
+  document.querySelector('.chrome-bar').textContent = '🔒 ' + (urlMap[name] || 'scorecast.app')
+}
+
+function changeScore(team, delta) {
+  if (team === 'home') homeScore = Math.max(0, Math.min(20, homeScore + delta))
+  else awayScore = Math.max(0, Math.min(20, awayScore + delta))
+  document.getElementById('score-home').textContent = homeScore
+  document.getElementById('score-away').textContent = awayScore
+  const result = document.getElementById('predict-result')
+  if (homeScore > awayScore) result.innerHTML = `🇫🇷 Victoire France <span style="color:var(--text-muted)">— peut valoir 1 ou 3 pts</span>`
+  else if (awayScore > homeScore) result.innerHTML = `🇲🇦 Victoire Maroc <span style="color:var(--text-muted)">— peut valoir 1 ou 3 pts</span>`
+  else result.innerHTML = `🤝 Match nul <span style="color:var(--text-muted)">— peut valoir 1 ou 3 pts</span>`
+  document.getElementById('confirm-msg').style.display = 'none'
+}
+
+function confirmPrediction() {
+  const msg = document.getElementById('confirm-msg')
+  msg.innerHTML = `✅ Pronostic enregistré ! France ${homeScore} — ${awayScore} Maroc`
+  msg.style.display = 'block'
+  setTimeout(() => msg.style.display = 'none', 3000)
+}
+
+function filterGroup(el, group) {
+  el.closest('.group-tabs, div').querySelectorAll('.group-tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+}
+</script>
+</body>
+</html>

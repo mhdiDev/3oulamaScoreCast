@@ -1,0 +1,9 @@
+{"type":"server-started","port":59560,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59560","screen_dir":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content","state_dir":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/state"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/architecture.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/datamodel.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/pages.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/datamodel-v2.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/ux-wireframes.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/moodboard.html"}
+{"type":"screen-added","file":"/Users/Mehdi/Work/code/3oulamaScoreCast/.superpowers/brainstorm/39088-1781076795/content/prototype.html"}
+{"type":"server-stopped","reason":"idle timeout"}
