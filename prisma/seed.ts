@@ -135,14 +135,23 @@ async function main() {
   console.log('🌱 Import calendrier officiel CM 2026 depuis football-data.org…')
 
   // ── 1. Récupérer tous les matchs ────────────────────────────────
-  const data = await apiFetch('/competitions/WC/matches')
+  const data = await apiFetch('/competitions/WC/matches?season=2026')
   const matches: any[] = data.matches ?? []
 
   if (matches.length === 0) {
     console.warn('⚠️  Aucun match retourné par l\'API')
+    console.warn('Réponse brute:', JSON.stringify(data).slice(0, 500))
     return
   }
   console.log(`📥 ${matches.length} matchs récupérés`)
+  // Log du 1er match pour vérifier la saison
+  const first = matches[0]
+  console.log(`1er match: ${first.homeTeam?.shortName} vs ${first.awayTeam?.shortName} | ${first.utcDate} | stage: ${first.stage}`)
+  const year = new Date(first.utcDate).getFullYear()
+  if (year !== 2026) {
+    console.warn(`⚠️  ATTENTION: Les matchs sont de ${year}, pas 2026 !`)
+    console.warn('Vérifier le paramètre season ou la disponibilité des données 2026 sur l\'API.')
+  }
 
   // ── 2. Collecter les équipes uniques depuis les matchs ──────────
   const teamsMap = new Map<number, any>()
