@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 interface ProfileUser {
   id: string
@@ -117,6 +118,18 @@ export function ProfileForm({ user }: { user: ProfileUser }) {
                    transition-colors focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
       >
         {saving ? 'Enregistrement…' : saved ? '✓ Enregistré !' : 'Sauvegarder'}
+      </button>
+
+      {/* Déconnexion — visible surtout sur mobile */}
+      <button
+        type="button"
+        onClick={() => signOut({ callbackUrl: '/login' })}
+        className="w-full flex items-center justify-center gap-2 mt-2 py-3 rounded-xl
+                   border border-red-800/40 text-red-400 text-sm font-medium
+                   hover:bg-red-900/20 transition-colors lg:hidden"
+      >
+        <span aria-hidden>🚪</span>
+        Se déconnecter
       </button>
     </form>
   )

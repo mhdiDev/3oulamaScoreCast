@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { clsx } from 'clsx'
 
 const navItems = [
@@ -82,6 +83,18 @@ export function Sidebar({ isAdmin }: SidebarProps) {
           </>
         )}
       </nav>
+
+      {/* Déconnexion */}
+      <div className="px-3 py-4 border-t border-[#334155]">
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                     text-[#94a3b8] hover:bg-red-900/30 hover:text-red-400 transition-colors"
+        >
+          <span aria-hidden>🚪</span>
+          Déconnexion
+        </button>
+      </div>
     </aside>
   )
 }
