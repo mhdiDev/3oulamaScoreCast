@@ -1,6 +1,6 @@
 import { calculatePoints, computeStreak } from '@/lib/scoring'
 
-const rule = { exactScore: 3, correctResult: 1, wrongPrediction: 0 }
+const rule = { exactScore: 3, closeResult: 2, correctResult: 1, wrongPrediction: 0 }
 
 describe('calculatePoints', () => {
   it('returns exactScore for exact match', () => {
@@ -36,7 +36,7 @@ describe('calculatePoints', () => {
   })
 
   it('respects custom rule values', () => {
-    const custom = { exactScore: 5, correctResult: 2, wrongPrediction: -1 }
+    const custom = { exactScore: 5, closeResult: 3, correctResult: 2, wrongPrediction: -1 }
     expect(calculatePoints({ homeScore: 1, awayScore: 0 }, { homeScore: 1, awayScore: 0 }, custom)).toBe(5)
     expect(calculatePoints({ homeScore: 2, awayScore: 0 }, { homeScore: 1, awayScore: 0 }, custom)).toBe(2)
     expect(calculatePoints({ homeScore: 0, awayScore: 1 }, { homeScore: 1, awayScore: 0 }, custom)).toBe(-1)

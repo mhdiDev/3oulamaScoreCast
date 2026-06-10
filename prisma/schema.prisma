@@ -158,6 +158,7 @@ model Prediction {
 model ScoringRule {
   id              Int      @id @default(1)
   exactScore      Int      @default(3)
+  closeResult     Int      @default(2)
   correctResult   Int      @default(1)
   wrongPrediction Int      @default(0)
   updatedAt       DateTime @default(now()) @updatedAt

@@ -4,12 +4,14 @@ import { useRouter } from 'next/navigation'
 
 interface ScoringRule {
   exactScore: number
+  closeResult: number
   correctResult: number
   wrongPrediction: number
 }
 
 export function ScoringForm({ rule }: { rule: ScoringRule }) {
   const [exact, setExact] = useState(rule.exactScore)
+  const [close, setClose] = useState(rule.closeResult)
   const [correct, setCorrect] = useState(rule.correctResult)
   const [wrong, setWrong] = useState(rule.wrongPrediction)
   const [saving, setSaving] = useState(false)
@@ -25,7 +27,7 @@ export function ScoringForm({ rule }: { rule: ScoringRule }) {
       const res = await fetch('/api/admin/scoring', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exactScore: exact, correctResult: correct, wrongPrediction: wrong }),
+        body: JSON.stringify({ exactScore: exact, closeResult: close, correctResult: correct, wrongPrediction: wrong }),
       })
       if (!res.ok) throw new Error('Erreur lors de la sauvegarde')
       setSaved(true)
@@ -39,9 +41,10 @@ export function ScoringForm({ rule }: { rule: ScoringRule }) {
   }
 
   const fields = [
-    { label: 'Score exact', value: exact, set: setExact, color: 'text-[#fde68a]', desc: 'Ex: 2-1 prédit, 2-1 réel' },
-    { label: 'Bon résultat', value: correct, set: setCorrect, color: 'text-[#86efac]', desc: 'Ex: victoire prédite, victoire réelle' },
-    { label: 'Mauvais pronostic', value: wrong, set: setWrong, color: 'text-[#64748b]', desc: 'Résultat incorrect' },
+    { label: 'Score exact',          value: exact,   set: setExact,   color: 'text-[#fde68a]', desc: 'Ex: prédit 2-1, réel 2-1' },
+    { label: 'Bon résultat + proche', value: close,  set: setClose,   color: 'text-[#4ade80]', desc: 'Bon vainqueur + score d\'une équipe exact ou bon écart' },
+    { label: 'Bon résultat',          value: correct, set: setCorrect, color: 'text-[#93c5fd]', desc: 'Bon vainqueur ou nul, score différent' },
+    { label: 'Faux',                  value: wrong,   set: setWrong,   color: 'text-[#64748b]', desc: 'Mauvais résultat' },
   ]
 
   return (

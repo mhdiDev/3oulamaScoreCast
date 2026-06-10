@@ -5,7 +5,7 @@
 
 import { calculatePoints } from '@/lib/scoring'
 
-const defaultRule = { exactScore: 3, correctResult: 1, wrongPrediction: 0 }
+const defaultRule = { exactScore: 3, closeResult: 2, correctResult: 1, wrongPrediction: 0 }
 
 describe('Prediction scoring integration', () => {
   it('returns exact score points when score matches', () => {
@@ -21,7 +21,7 @@ describe('Prediction scoring integration', () => {
   })
 
   it('handles custom rule values', () => {
-    const customRule = { exactScore: 5, correctResult: 2, wrongPrediction: -1 }
+    const customRule = { exactScore: 5, closeResult: 3, correctResult: 2, wrongPrediction: -1 }
     expect(calculatePoints({ homeScore: 1, awayScore: 1 }, { homeScore: 1, awayScore: 1 }, customRule)).toBe(5)
     expect(calculatePoints({ homeScore: 1, awayScore: 0 }, { homeScore: 2, awayScore: 0 }, customRule)).toBe(2)
     expect(calculatePoints({ homeScore: 0, awayScore: 1 }, { homeScore: 1, awayScore: 0 }, customRule)).toBe(-1)

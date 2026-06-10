@@ -5,6 +5,7 @@ export interface ScoreInput {
 
 export interface ScoringRuleInput {
   exactScore: number
+  closeResult: number
   correctResult: number
   wrongPrediction: number
 }
@@ -14,6 +15,12 @@ export function calculatePoints(
   result: ScoreInput,
   rule: ScoringRuleInput,
 ): number {
+  const predDiff = prediction.homeScore - prediction.awayScore
+  const realDiff = result.homeScore - result.awayScore
+  const predWinner = Math.sign(predDiff)
+  const realWinner = Math.sign(realDiff)
+
+  // 3 pts — score exact
   if (
     prediction.homeScore === result.homeScore &&
     prediction.awayScore === result.awayScore
@@ -21,12 +28,20 @@ export function calculatePoints(
     return rule.exactScore
   }
 
-  const predictedWinner = Math.sign(prediction.homeScore - prediction.awayScore)
-  const actualWinner = Math.sign(result.homeScore - result.awayScore)
+  // Mauvais résultat → 0
+  if (predWinner !== realWinner) return rule.wrongPrediction
 
-  if (predictedWinner === actualWinner) return rule.correctResult
+  // Bon vainqueur (ou nul) — vérifier si "proche" (2 pts)
+  // Proche = score exact d'une équipe OU bon écart de buts
+  const oneTeamExact =
+    prediction.homeScore === result.homeScore ||
+    prediction.awayScore === result.awayScore
+  const correctGoalDiff = predDiff === realDiff
 
-  return rule.wrongPrediction
+  if (oneTeamExact || correctGoalDiff) return rule.closeResult
+
+  // Bon résultat simple → 1 pt
+  return rule.correctResult
 }
 
 export function computeStreak(

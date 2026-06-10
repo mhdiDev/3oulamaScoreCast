@@ -143,8 +143,8 @@ async function main() {
   // ── Scoring rule (toujours) ──────────────────────────────────────
   await prisma.scoringRule.upsert({
     where:  { id: 1 },
-    update: {},
-    create: { id: 1, exactScore: 3, correctResult: 1, wrongPrediction: 0 },
+    update: { exactScore: 3, closeResult: 2, correctResult: 1, wrongPrediction: 0 },
+    create: { id: 1, exactScore: 3, closeResult: 2, correctResult: 1, wrongPrediction: 0 },
   })
 
   if (!API_KEY) {

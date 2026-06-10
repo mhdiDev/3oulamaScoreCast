@@ -12,30 +12,39 @@ export default async function RulesPage() {
         <h2 className="font-bold mb-4 text-[#fbbf24]">⚽ Système de points</h2>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-[#451a03] border border-[#d97706] flex items-center justify-center font-bold text-[#fde68a]">
+            <span className="w-10 h-10 rounded-full bg-[#451a03] border border-[#d97706] flex items-center justify-center font-bold text-[#fde68a] text-lg">
               {rule?.exactScore ?? 3}
             </span>
             <div>
               <div className="font-semibold text-sm">Score exact</div>
-              <div className="text-xs text-[#64748b]">Vous avez deviné le score précis du match</div>
+              <div className="text-xs text-[#64748b]">Vous avez trouvé le score exact</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-[#052e16] border border-[#16a34a] flex items-center justify-center font-bold text-[#86efac]">
+            <span className="w-10 h-10 rounded-full bg-[#14532d] border border-[#16a34a] flex items-center justify-center font-bold text-[#4ade80] text-lg">
+              {rule?.closeResult ?? 2}
+            </span>
+            <div>
+              <div className="font-semibold text-sm">Bon résultat + proche</div>
+              <div className="text-xs text-[#64748b]">Bon vainqueur, avec le score exact d'une équipe ou le bon écart de buts</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-full bg-[#1e3a5f] border border-[#3b82f6] flex items-center justify-center font-bold text-[#93c5fd] text-lg">
               {rule?.correctResult ?? 1}
             </span>
             <div>
               <div className="font-semibold text-sm">Bon résultat</div>
-              <div className="text-xs text-[#64748b]">Victoire, défaite ou nul — bonne issue, score différent</div>
+              <div className="text-xs text-[#64748b]">Vous avez trouvé le bon vainqueur ou le nul</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-[#1e293b] border border-[#334155] flex items-center justify-center font-bold text-[#64748b]">
+            <span className="w-10 h-10 rounded-full bg-[#1e293b] border border-[#334155] flex items-center justify-center font-bold text-[#64748b] text-lg">
               {rule?.wrongPrediction ?? 0}
             </span>
             <div>
-              <div className="font-semibold text-sm">Mauvais pronostic</div>
-              <div className="text-xs text-[#64748b]">Le résultat ne correspond pas du tout</div>
+              <div className="font-semibold text-sm">Faux</div>
+              <div className="text-xs text-[#64748b]">Mauvais résultat</div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { calculatePoints, computeStreak } from '@/lib/scoring'
 
-const rule = { exactScore: 3, correctResult: 1, wrongPrediction: 0 }
+const rule = { exactScore: 3, closeResult: 2, correctResult: 1, wrongPrediction: 0 }
 
 describe('Leaderboard calculation helpers', () => {
   describe('computeStreak', () => {

@@ -1,0 +1,1 @@
+ALTER TABLE "ScoringRule" ADD COLUMN "closeResult" INTEGER NOT NULL DEFAULT 2;

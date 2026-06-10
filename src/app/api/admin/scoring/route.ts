@@ -17,10 +17,11 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json()
-  const { exactScore, correctResult, wrongPrediction } = body
+  const { exactScore, closeResult, correctResult, wrongPrediction } = body
 
   if (
     typeof exactScore !== 'number' ||
+    typeof closeResult !== 'number' ||
     typeof correctResult !== 'number' ||
     typeof wrongPrediction !== 'number'
   ) {
@@ -29,7 +30,7 @@ export async function PUT(req: NextRequest) {
 
   const rule = await prisma.scoringRule.update({
     where: { id: 1 },
-    data:  { exactScore, correctResult, wrongPrediction, updatedById: session.user.id },
+    data:  { exactScore, closeResult, correctResult, wrongPrediction, updatedById: session.user.id },
   })
   return NextResponse.json(rule)
 }
