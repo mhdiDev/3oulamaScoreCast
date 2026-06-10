@@ -10,7 +10,7 @@ const PUBLIC_PATHS = [
   '/api/auth',
 ]
 
-export default auth(async function middleware(req) {
+export default auth(async function proxy(req) {
   const { nextUrl, auth: session } = req as any
   const pathname: string = nextUrl.pathname
 
