@@ -61,8 +61,8 @@ const teams = [
   { code: 'SCO', name: 'Écosse',     nameEn: 'Scotland',      group: 'K', fifaRanking: 39 },
   { code: 'CIV', name: "Côte d'Ivoire", nameEn: 'Ivory Coast', group: 'K', fifaRanking: 50 },
   // Groupe L
-  { code: 'POR2', name: 'Portugal B', nameEn: 'Portugal B',   group: 'L', fifaRanking: 6  }, // placeholder
-  { code: 'MEX2', name: 'Mexique B',  nameEn: 'Mexico B',     group: 'L', fifaRanking: 16 }, // placeholder
+  { code: 'PT2', name: 'Portugal B', nameEn: 'Portugal B',   group: 'L', fifaRanking: 6  },
+  { code: 'MX2', name: 'Mexique B',  nameEn: 'Mexico B',     group: 'L', fifaRanking: 16 },
   { code: 'NGA', name: 'Nigeria',    nameEn: 'Nigeria',       group: 'L', fifaRanking: 30 },
   { code: 'GHA', name: 'Ghana',      nameEn: 'Ghana',         group: 'L', fifaRanking: 60 },
 ]
@@ -159,7 +159,7 @@ async function main() {
     I: ['JPN', 'KOR', 'SAU', 'CHN'],
     J: ['BEL', 'ITA', 'SUI', 'UKR'],
     K: ['CRO', 'DAN', 'SCO', 'CIV'],
-    L: ['NGA', 'GHA', 'POR2', 'MEX2'],
+    L: ['NGA', 'GHA', 'PT2', 'MX2'],
   }
 
   const groupStartDates: Record<string, Date> = {
@@ -196,22 +196,6 @@ async function main() {
       matchCount++
     }
   }
-
-  // Knockout stubs (dates provisoires, équipes TBD seront remplies dynamiquement)
-  const knockoutStubs = [
-    // R32 (16 matchs)
-    ...Array.from({ length: 16 }, (_, i) => ({
-      externalId: `WC2026-R32-${i + 1}`,
-      homeTeamId: (await prisma.team.findFirst())!.id,
-      awayTeamId: (await prisma.team.findFirst())!.id,
-      kickoffAt:  new Date(`2026-07-04T21:00:00Z`),
-      cutoffAt:   cutoff(new Date(`2026-07-04T21:00:00Z`)),
-      stage:      Stage.R32 as Stage,
-      stadium:    'TBD', city: 'TBD',
-    })),
-  ]
-  // Note: knockout stubs seront mis à jour quand les équipes qualifiées seront connues
-  // Pour le prototype, on crée juste les stubs R32
 
   console.log(`✓ ${matchCount} matchs de groupe créés`)
 
