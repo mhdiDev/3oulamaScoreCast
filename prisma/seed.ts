@@ -3,68 +3,69 @@ import { addMinutes } from 'date-fns'
 
 const prisma = new PrismaClient()
 
-// ── 48 équipes CM 2026 ──────────────────────────────────────────
+// ── 48 équipes CM 2026 (tirage au sort du 5 déc. 2024) ──────────────
+// Nations hôtes dans des groupes séparés : Mexique (A), USA (B), Canada (C)
 const teams = [
-  // Groupe A
-  { code: 'USA', name: 'États-Unis', nameEn: 'United States', group: 'A', fifaRanking: 13 },
-  { code: 'MEX', name: 'Mexique',    nameEn: 'Mexico',        group: 'A', fifaRanking: 16 },
-  { code: 'CAN', name: 'Canada',     nameEn: 'Canada',        group: 'A', fifaRanking: 49 },
-  { code: 'PAN', name: 'Panama',     nameEn: 'Panama',        group: 'A', fifaRanking: 82 },
-  // Groupe B
-  { code: 'ARG', name: 'Argentine',  nameEn: 'Argentina',     group: 'B', fifaRanking: 1  },
-  { code: 'CHI', name: 'Chili',      nameEn: 'Chile',         group: 'B', fifaRanking: 42 },
-  { code: 'PER', name: 'Pérou',      nameEn: 'Peru',          group: 'B', fifaRanking: 64 },
-  { code: 'AUS', name: 'Australie',  nameEn: 'Australia',     group: 'B', fifaRanking: 23 },
-  // Groupe C
-  { code: 'BRA', name: 'Brésil',     nameEn: 'Brazil',        group: 'C', fifaRanking: 5  },
-  { code: 'COL', name: 'Colombie',   nameEn: 'Colombia',      group: 'C', fifaRanking: 9  },
-  { code: 'PAR', name: 'Paraguay',   nameEn: 'Paraguay',      group: 'C', fifaRanking: 66 },
-  { code: 'AHO', name: 'Curaçao',    nameEn: 'Curaçao',       group: 'C', fifaRanking: 80 },
+  // Groupe A — Mexique (hôte)
+  { code: 'MEX', name: 'Mexique',       nameEn: 'Mexico',         group: 'A', fifaRanking: 16 },
+  { code: 'ZAF', name: 'Afrique du Sud',nameEn: 'South Africa',   group: 'A', fifaRanking: 61 },
+  { code: 'ECU', name: 'Équateur',      nameEn: 'Ecuador',        group: 'A', fifaRanking: 45 },
+  { code: 'POL', name: 'Pologne',       nameEn: 'Poland',         group: 'A', fifaRanking: 28 },
+  // Groupe B — États-Unis (hôte)
+  { code: 'USA', name: 'États-Unis',    nameEn: 'United States',  group: 'B', fifaRanking: 13 },
+  { code: 'PAN', name: 'Panama',        nameEn: 'Panama',         group: 'B', fifaRanking: 82 },
+  { code: 'BOL', name: 'Bolivie',       nameEn: 'Bolivia',        group: 'B', fifaRanking: 85 },
+  { code: 'UKR', name: 'Ukraine',       nameEn: 'Ukraine',        group: 'B', fifaRanking: 21 },
+  // Groupe C — Canada (hôte)
+  { code: 'CAN', name: 'Canada',        nameEn: 'Canada',         group: 'C', fifaRanking: 49 },
+  { code: 'MAR', name: 'Maroc',         nameEn: 'Morocco',        group: 'C', fifaRanking: 14 },
+  { code: 'PER', name: 'Pérou',         nameEn: 'Peru',           group: 'C', fifaRanking: 64 },
+  { code: 'CRO', name: 'Croatie',       nameEn: 'Croatia',        group: 'C', fifaRanking: 10 },
   // Groupe D
-  { code: 'URU', name: 'Uruguay',    nameEn: 'Uruguay',       group: 'D', fifaRanking: 7  },
-  { code: 'ECU', name: 'Équateur',   nameEn: 'Ecuador',       group: 'D', fifaRanking: 45 },
-  { code: 'BOL', name: 'Bolivie',    nameEn: 'Bolivia',       group: 'D', fifaRanking: 85 },
-  { code: 'JAM', name: 'Jamaïque',   nameEn: 'Jamaica',       group: 'D', fifaRanking: 55 },
+  { code: 'ARG', name: 'Argentine',     nameEn: 'Argentina',      group: 'D', fifaRanking: 1  },
+  { code: 'CHI', name: 'Chili',         nameEn: 'Chile',          group: 'D', fifaRanking: 42 },
+  { code: 'JAM', name: 'Jamaïque',      nameEn: 'Jamaica',        group: 'D', fifaRanking: 55 },
+  { code: 'SEN', name: 'Sénégal',       nameEn: 'Senegal',        group: 'D', fifaRanking: 18 },
   // Groupe E
-  { code: 'FRA', name: 'France',     nameEn: 'France',        group: 'E', fifaRanking: 2  },
-  { code: 'MAR', name: 'Maroc',      nameEn: 'Morocco',       group: 'E', fifaRanking: 14 },
-  { code: 'ALG', name: 'Algérie',    nameEn: 'Algeria',       group: 'E', fifaRanking: 36 },
-  { code: 'TUN', name: 'Tunisie',    nameEn: 'Tunisia',       group: 'E', fifaRanking: 30 },
+  { code: 'FRA', name: 'France',        nameEn: 'France',         group: 'E', fifaRanking: 2  },
+  { code: 'TUN', name: 'Tunisie',       nameEn: 'Tunisia',        group: 'E', fifaRanking: 30 },
+  { code: 'URU', name: 'Uruguay',       nameEn: 'Uruguay',        group: 'E', fifaRanking: 7  },
+  { code: 'AUS', name: 'Australie',     nameEn: 'Australia',      group: 'E', fifaRanking: 23 },
   // Groupe F
-  { code: 'ESP', name: 'Espagne',    nameEn: 'Spain',         group: 'F', fifaRanking: 6  },
-  { code: 'POR', name: 'Portugal',   nameEn: 'Portugal',      group: 'F', fifaRanking: 6  },
-  { code: 'SEN', name: 'Sénégal',    nameEn: 'Senegal',       group: 'F', fifaRanking: 18 },
-  { code: 'TGO', name: 'Togo',       nameEn: 'Togo',          group: 'F', fifaRanking: 94 },
+  { code: 'ESP', name: 'Espagne',       nameEn: 'Spain',          group: 'F', fifaRanking: 6  },
+  { code: 'POR', name: 'Portugal',      nameEn: 'Portugal',       group: 'F', fifaRanking: 6  },
+  { code: 'EGY', name: 'Égypte',        nameEn: 'Egypt',          group: 'F', fifaRanking: 33 },
+  { code: 'NZL', name: 'Nouvelle-Zélande', nameEn: 'New Zealand', group: 'F', fifaRanking: 99 },
   // Groupe G
-  { code: 'GER', name: 'Allemagne',  nameEn: 'Germany',       group: 'G', fifaRanking: 16 },
-  { code: 'NED', name: 'Pays-Bas',   nameEn: 'Netherlands',   group: 'G', fifaRanking: 8  },
-  { code: 'AUT', name: 'Autriche',   nameEn: 'Austria',       group: 'G', fifaRanking: 25 },
-  { code: 'TUR', name: 'Turquie',    nameEn: 'Turkey',        group: 'G', fifaRanking: 40 },
+  { code: 'BRA', name: 'Brésil',        nameEn: 'Brazil',         group: 'G', fifaRanking: 5  },
+  { code: 'COL', name: 'Colombie',      nameEn: 'Colombia',       group: 'G', fifaRanking: 9  },
+  { code: 'AUT', name: 'Autriche',      nameEn: 'Austria',        group: 'G', fifaRanking: 25 },
+  { code: 'CMR', name: 'Cameroun',      nameEn: 'Cameroon',       group: 'G', fifaRanking: 43 },
   // Groupe H
-  { code: 'ENG', name: 'Angleterre', nameEn: 'England',       group: 'H', fifaRanking: 4  },
-  { code: 'IRI', name: 'Iran',       nameEn: 'Iran',          group: 'H', fifaRanking: 22 },
-  { code: 'WAL', name: 'Pays de Galles', nameEn: 'Wales',     group: 'H', fifaRanking: 26 },
-  { code: 'IRQ', name: 'Irak',       nameEn: 'Iraq',          group: 'H', fifaRanking: 63 },
+  { code: 'ENG', name: 'Angleterre',    nameEn: 'England',        group: 'H', fifaRanking: 4  },
+  { code: 'TUR', name: 'Turquie',       nameEn: 'Turkey',         group: 'H', fifaRanking: 40 },
+  { code: 'SUI', name: 'Suisse',        nameEn: 'Switzerland',    group: 'H', fifaRanking: 19 },
+  { code: 'ALG', name: 'Algérie',       nameEn: 'Algeria',        group: 'H', fifaRanking: 36 },
   // Groupe I
-  { code: 'JPN', name: 'Japon',      nameEn: 'Japan',         group: 'I', fifaRanking: 17 },
-  { code: 'KOR', name: 'Corée du Sud', nameEn: 'South Korea', group: 'I', fifaRanking: 23 },
-  { code: 'SAU', name: 'Arabie Saoudite', nameEn: 'Saudi Arabia', group: 'I', fifaRanking: 56 },
-  { code: 'CHN', name: 'Chine',      nameEn: 'China',         group: 'I', fifaRanking: 88 },
+  { code: 'GER', name: 'Allemagne',     nameEn: 'Germany',        group: 'I', fifaRanking: 16 },
+  { code: 'NED', name: 'Pays-Bas',      nameEn: 'Netherlands',    group: 'I', fifaRanking: 8  },
+  { code: 'JPN', name: 'Japon',         nameEn: 'Japan',          group: 'I', fifaRanking: 17 },
+  { code: 'CIV', name: "Côte d'Ivoire", nameEn: 'Ivory Coast',    group: 'I', fifaRanking: 50 },
   // Groupe J
-  { code: 'BEL', name: 'Belgique',   nameEn: 'Belgium',       group: 'J', fifaRanking: 3  },
-  { code: 'ITA', name: 'Italie',     nameEn: 'Italy',         group: 'J', fifaRanking: 9  },
-  { code: 'SUI', name: 'Suisse',     nameEn: 'Switzerland',   group: 'J', fifaRanking: 19 },
-  { code: 'UKR', name: 'Ukraine',    nameEn: 'Ukraine',       group: 'J', fifaRanking: 21 },
+  { code: 'BEL', name: 'Belgique',      nameEn: 'Belgium',        group: 'J', fifaRanking: 3  },
+  { code: 'ITA', name: 'Italie',        nameEn: 'Italy',          group: 'J', fifaRanking: 9  },
+  { code: 'DAN', name: 'Danemark',      nameEn: 'Denmark',        group: 'J', fifaRanking: 13 },
+  { code: 'KOR', name: 'Corée du Sud',  nameEn: 'South Korea',    group: 'J', fifaRanking: 23 },
   // Groupe K
-  { code: 'CRO', name: 'Croatie',    nameEn: 'Croatia',       group: 'K', fifaRanking: 10 },
-  { code: 'DAN', name: 'Danemark',   nameEn: 'Denmark',       group: 'K', fifaRanking: 13 },
-  { code: 'SCO', name: 'Écosse',     nameEn: 'Scotland',      group: 'K', fifaRanking: 39 },
-  { code: 'CIV', name: "Côte d'Ivoire", nameEn: 'Ivory Coast', group: 'K', fifaRanking: 50 },
+  { code: 'PAR', name: 'Paraguay',      nameEn: 'Paraguay',       group: 'K', fifaRanking: 66 },
+  { code: 'NGA', name: 'Nigeria',       nameEn: 'Nigeria',        group: 'K', fifaRanking: 30 },
+  { code: 'GHA', name: 'Ghana',         nameEn: 'Ghana',          group: 'K', fifaRanking: 60 },
+  { code: 'IRI', name: 'Iran',          nameEn: 'Iran',           group: 'K', fifaRanking: 22 },
   // Groupe L
-  { code: 'PT2', name: 'Portugal B', nameEn: 'Portugal B',   group: 'L', fifaRanking: 6  },
-  { code: 'MX2', name: 'Mexique B',  nameEn: 'Mexico B',     group: 'L', fifaRanking: 16 },
-  { code: 'NGA', name: 'Nigeria',    nameEn: 'Nigeria',       group: 'L', fifaRanking: 30 },
-  { code: 'GHA', name: 'Ghana',      nameEn: 'Ghana',         group: 'L', fifaRanking: 60 },
+  { code: 'SAU', name: 'Arabie Saoudite', nameEn: 'Saudi Arabia', group: 'L', fifaRanking: 56 },
+  { code: 'CHN', name: 'Chine',         nameEn: 'China',          group: 'L', fifaRanking: 88 },
+  { code: 'SCO', name: 'Écosse',        nameEn: 'Scotland',       group: 'L', fifaRanking: 39 },
+  { code: 'IRQ', name: 'Irak',          nameEn: 'Iraq',           group: 'L', fifaRanking: 63 },
 ]
 
 // Helper : kickoffAt → cutoffAt = kickoffAt - 5min
@@ -96,18 +97,18 @@ function groupMatches(
   ] as [number, number][]
 
   const stadiums: Record<string, { stadium: string; city: string }> = {
-    A: { stadium: 'SoFi Stadium',           city: 'Los Angeles' },
-    B: { stadium: 'MetLife Stadium',         city: 'New York' },
-    C: { stadium: 'AT&T Stadium',            city: 'Dallas' },
-    D: { stadium: 'NRG Stadium',             city: 'Houston' },
-    E: { stadium: 'Levi\'s Stadium',         city: 'San Francisco' },
-    F: { stadium: 'Hard Rock Stadium',       city: 'Miami' },
-    G: { stadium: 'Arrowhead Stadium',       city: 'Kansas City' },
-    H: { stadium: 'Lincoln Financial Field', city: 'Philadelphie' },
-    I: { stadium: 'Estadio Azteca',          city: 'Mexico City' },
-    J: { stadium: 'Estadio BBVA',            city: 'Monterrey' },
-    K: { stadium: 'Estadio Akron',           city: 'Guadalajara' },
-    L: { stadium: 'BC Place',               city: 'Vancouver' },
+    A: { stadium: 'Estadio Azteca',          city: 'Mexico City' },   // Mexique hôte
+    B: { stadium: 'MetLife Stadium',         city: 'New York/NJ' },   // USA hôte
+    C: { stadium: 'BC Place',               city: 'Vancouver' },      // Canada hôte
+    D: { stadium: 'SoFi Stadium',           city: 'Los Angeles' },
+    E: { stadium: 'AT&T Stadium',           city: 'Dallas' },
+    F: { stadium: 'Hard Rock Stadium',      city: 'Miami' },
+    G: { stadium: 'NRG Stadium',            city: 'Houston' },
+    H: { stadium: 'Lincoln Financial Field',city: 'Philadelphie' },
+    I: { stadium: 'Allianz Field',          city: 'Minneapolis' },
+    J: { stadium: 'Arrowhead Stadium',      city: 'Kansas City' },
+    K: { stadium: 'Estadio BBVA',           city: 'Monterrey' },
+    L: { stadium: 'Estadio Akron',          city: 'Guadalajara' },
   }
 
   return pairs.map(([i, j], idx) => {
@@ -146,29 +147,29 @@ async function main() {
   }
   console.log(`✓ ${teams.length} équipes créées`)
 
-  // Group matches
+  // Group matches — tirage CM 2026 (nations hôtes dans groupes séparés)
   const groups: Record<string, string[]> = {
-    A: ['USA', 'MEX', 'CAN', 'PAN'],
-    B: ['ARG', 'CHI', 'PER', 'AUS'],
-    C: ['BRA', 'COL', 'PAR', 'AHO'],
-    D: ['URU', 'ECU', 'BOL', 'JAM'],
-    E: ['FRA', 'MAR', 'ALG', 'TUN'],
-    F: ['ESP', 'POR', 'SEN', 'TGO'],
-    G: ['GER', 'NED', 'AUT', 'TUR'],
-    H: ['ENG', 'IRI', 'WAL', 'IRQ'],
-    I: ['JPN', 'KOR', 'SAU', 'CHN'],
-    J: ['BEL', 'ITA', 'SUI', 'UKR'],
-    K: ['CRO', 'DAN', 'SCO', 'CIV'],
-    L: ['NGA', 'GHA', 'PT2', 'MX2'],
+    A: ['MEX', 'ZAF', 'ECU', 'POL'],  // Mexique hôte — 1er match = MEX vs ZAF
+    B: ['USA', 'PAN', 'BOL', 'UKR'],  // États-Unis hôte
+    C: ['CAN', 'MAR', 'PER', 'CRO'],  // Canada hôte
+    D: ['ARG', 'CHI', 'JAM', 'SEN'],
+    E: ['FRA', 'TUN', 'URU', 'AUS'],
+    F: ['ESP', 'POR', 'EGY', 'NZL'],
+    G: ['BRA', 'COL', 'AUT', 'CMR'],
+    H: ['ENG', 'TUR', 'SUI', 'ALG'],
+    I: ['GER', 'NED', 'JPN', 'CIV'],
+    J: ['BEL', 'ITA', 'DAN', 'KOR'],
+    K: ['PAR', 'NGA', 'GHA', 'IRI'],
+    L: ['SAU', 'CHN', 'SCO', 'IRQ'],
   }
 
   const groupStartDates: Record<string, Date> = {
-    A: new Date('2026-06-11'), B: new Date('2026-06-12'),
-    C: new Date('2026-06-13'), D: new Date('2026-06-14'),
-    E: new Date('2026-06-15'), F: new Date('2026-06-16'),
-    G: new Date('2026-06-17'), H: new Date('2026-06-18'),
-    I: new Date('2026-06-19'), J: new Date('2026-06-20'),
-    K: new Date('2026-06-21'), L: new Date('2026-06-22'),
+    A: new Date('2026-06-11'), B: new Date('2026-06-11'),
+    C: new Date('2026-06-12'), D: new Date('2026-06-13'),
+    E: new Date('2026-06-14'), F: new Date('2026-06-15'),
+    G: new Date('2026-06-16'), H: new Date('2026-06-17'),
+    I: new Date('2026-06-18'), J: new Date('2026-06-19'),
+    K: new Date('2026-06-20'), L: new Date('2026-06-21'),
   }
 
   let matchCount = 0
