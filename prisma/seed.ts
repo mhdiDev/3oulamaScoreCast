@@ -83,6 +83,24 @@ const FR_NAMES: Record<string, string> = {
   'Thailand': 'Thaïlande',
   'Uzbekistan': 'Ouzbékistan',
   'Qatar': 'Qatar',
+  'Bosnia-H.': 'Bosnie-Herzégovine',
+  'Bosnia and Herzegovina': 'Bosnie-Herzégovine',
+  'Czechia': 'Tchéquie',
+  'Korea Republic': 'Corée du Sud',
+  'Congo DR': 'RD Congo',
+  'Cape Verde': 'Cap-Vert',
+  'Curaçao': 'Curaçao',
+  'Haiti': 'Haïti',
+  'Jordan': 'Jordanie',
+  'Norway': 'Norvège',
+  'Sweden': 'Suède',
+  'Uzbekistan': 'Ouzbékistan',
+  'Scotland': 'Écosse',
+  'Ghana': 'Ghana',
+  'Iran': 'Iran',
+  'Croatia': 'Croatie',
+  'England': 'Angleterre',
+  'USA': 'États-Unis',
 }
 
 function frName(en: string): string {
@@ -91,13 +109,15 @@ function frName(en: string): string {
 
 function mapStage(s: string): Stage {
   const m: Record<string, Stage> = {
-    GROUP_STAGE: Stage.GROUP,
-    ROUND_OF_32: Stage.R32,
-    ROUND_OF_16: Stage.R16,
+    GROUP_STAGE:   Stage.GROUP,
+    LAST_32:       Stage.R32,
+    ROUND_OF_32:   Stage.R32,
+    LAST_16:       Stage.R16,
+    ROUND_OF_16:   Stage.R16,
     QUARTER_FINALS: Stage.QF,
-    SEMI_FINALS: Stage.SF,
-    FINAL: Stage.FINAL,
-    THIRD_PLACE: Stage.SF,
+    SEMI_FINALS:   Stage.SF,
+    FINAL:         Stage.FINAL,
+    THIRD_PLACE:   Stage.SF,
   }
   return m[s] ?? Stage.GROUP
 }
