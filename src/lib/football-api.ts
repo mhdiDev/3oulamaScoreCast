@@ -13,7 +13,7 @@ export async function fetchLiveAndFinishedMatches(): Promise<ApiMatch[]> {
   const res = await fetch(
     `${BASE}/competitions/${COMPETITION}/matches?status=IN_PLAY,PAUSED,FINISHED`,
     {
-      headers: { 'X-Auth-Token': process.env.FOOTBALL_API_KEY! },
+      headers: { 'X-Auth-Token': process.env.FOOTBALL_DATA_API_KEY! },
       next: { revalidate: 0 },
     },
   )

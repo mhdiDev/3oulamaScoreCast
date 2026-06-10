@@ -5,7 +5,7 @@ services:
     region: frankfurt
     plan: free
     buildCommand: npm install && npx prisma generate && npm run build && cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static
-    startCommand: npx prisma migrate deploy && HOSTNAME=0.0.0.0 node .next/standalone/server.js
+    startCommand: npx prisma migrate deploy && npx tsx prisma/seed.ts && HOSTNAME=0.0.0.0 node .next/standalone/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
