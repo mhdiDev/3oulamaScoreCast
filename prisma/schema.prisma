@@ -73,6 +73,7 @@ model User {
 model Invitation {
   id          String    @id @default(uuid())
   token       String    @unique @default(uuid())
+  email       String?
   createdBy   User      @relation("CreatedBy", fields: [createdById], references: [id])
   createdById String
   group       Group?    @relation(fields: [groupId], references: [id])
