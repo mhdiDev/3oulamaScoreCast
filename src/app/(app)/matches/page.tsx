@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { TeamFlag } from '@/components/ui/TeamFlag'
 
 const STAGE_LABELS: Record<string, string> = {
   GROUP: 'Phase de groupes',
@@ -87,22 +88,28 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
                              hover:border-[#154d8f] transition-colors gap-3"
                 >
                   <div className="flex-1 flex items-center justify-between gap-2 text-sm font-semibold min-w-0">
-                    <span className="truncate">{match.homeTeam.name}</span>
-                    <div className="flex flex-col items-center shrink-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <TeamFlag name={match.homeTeam.name} flagUrl={match.homeTeam.flagUrl} size="sm" />
+                      <span className="truncate">{match.homeTeam.name}</span>
+                    </div>
+                    <div className="flex flex-col items-center shrink-0 px-1">
                       {match.status === 'LIVE' && (
                         <span className="text-[10px] font-bold text-red-400 animate-pulse mb-0.5">● LIVE</span>
                       )}
                       {match.status === 'FINISHED' ? (
-                        <span className="font-extrabold text-[#fbbf24]">
+                        <span className="font-extrabold text-[#fbbf24] tabular-nums">
                           {match.homeScore} — {match.awayScore}
                         </span>
                       ) : (
-                        <span className="text-xs text-[#94a3b8]">
+                        <span className="text-xs text-[#94a3b8] tabular-nums">
                           {new Date(match.kickoffAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       )}
                     </div>
-                    <span className="truncate text-right">{match.awayTeam.name}</span>
+                    <div className="flex items-center gap-2 min-w-0 justify-end">
+                      <span className="truncate text-right">{match.awayTeam.name}</span>
+                      <TeamFlag name={match.awayTeam.name} flagUrl={match.awayTeam.flagUrl} size="sm" />
+                    </div>
                   </div>
                   <div className="shrink-0">
                     {pred ? (

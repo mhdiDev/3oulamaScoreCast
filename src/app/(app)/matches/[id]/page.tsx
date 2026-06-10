@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import { PredictionForm } from '@/components/predictions/PredictionForm'
+import { TeamFlag } from '@/components/ui/TeamFlag'
 
 export default async function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -61,33 +62,35 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
           })}
         </div>
 
-        <div className="flex items-center justify-center gap-8">
-          <div className="text-center">
-            <div className="text-4xl mb-2">🏳</div>
-            <div className="font-bold">{match.homeTeam.name}</div>
+        <div className="flex items-center justify-center gap-6">
+          <div className="text-center flex flex-col items-center gap-2 w-28">
+            <TeamFlag name={match.homeTeam.name} flagUrl={match.homeTeam.flagUrl} size="lg" />
+            <div className="font-bold text-sm leading-tight">{match.homeTeam.name}</div>
           </div>
 
-          {match.status === 'FINISHED' ? (
-            <div className="text-center">
-              <div className="text-3xl font-extrabold text-[#fbbf24] tabular-nums">
-                {match.homeScore} — {match.awayScore}
-              </div>
-              <div className="text-xs text-[#22c55e] mt-1">Terminé</div>
-            </div>
-          ) : match.status === 'LIVE' ? (
-            <div className="text-center">
-              <div className="text-3xl font-extrabold text-[#fbbf24] tabular-nums">
-                {match.homeScore ?? 0} — {match.awayScore ?? 0}
-              </div>
-              <div className="text-xs text-red-400 animate-pulse mt-1">● LIVE</div>
-            </div>
-          ) : (
-            <div className="text-[#64748b] font-light text-2xl">vs</div>
-          )}
+          <div className="flex flex-col items-center gap-1 px-2">
+            {match.status === 'FINISHED' ? (
+              <>
+                <div className="text-3xl font-extrabold text-[#fbbf24] tabular-nums">
+                  {match.homeScore} — {match.awayScore}
+                </div>
+                <div className="text-xs text-[#22c55e]">Terminé</div>
+              </>
+            ) : match.status === 'LIVE' ? (
+              <>
+                <div className="text-3xl font-extrabold text-[#fbbf24] tabular-nums">
+                  {match.homeScore ?? 0} — {match.awayScore ?? 0}
+                </div>
+                <div className="text-xs text-red-400 animate-pulse">● LIVE</div>
+              </>
+            ) : (
+              <div className="text-[#64748b] font-light text-2xl">vs</div>
+            )}
+          </div>
 
-          <div className="text-center">
-            <div className="text-4xl mb-2">🏳</div>
-            <div className="font-bold">{match.awayTeam.name}</div>
+          <div className="text-center flex flex-col items-center gap-2 w-28">
+            <TeamFlag name={match.awayTeam.name} flagUrl={match.awayTeam.flagUrl} size="lg" />
+            <div className="font-bold text-sm leading-tight">{match.awayTeam.name}</div>
           </div>
         </div>
       </div>

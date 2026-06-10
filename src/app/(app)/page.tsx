@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { TeamFlag } from '@/components/ui/TeamFlag'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -97,25 +98,29 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <span>{match.homeTeam.name}</span>
+                <div className="flex items-center gap-2 text-sm font-semibold min-w-0">
+                  <TeamFlag name={match.homeTeam.name} flagUrl={match.homeTeam.flagUrl} size="sm" />
+                  <span className="truncate">{match.homeTeam.name}</span>
                 </div>
-                {pred ? (
-                  <div className="bg-[#041629] rounded-lg px-3 py-1 text-sm font-bold text-[#93c5fd]">
-                    {pred.homeScore} — {pred.awayScore}
-                    {pred.points !== null && (
-                      <span className="ml-1 text-xs text-[#fbbf24]">+{pred.points}pts</span>
-                    )}
-                  </div>
-                ) : isPast ? (
-                  <span className="text-xs text-[#64748b]">Coupure dépassée</span>
-                ) : (
-                  <span className="bg-[#f59e0b] text-[#020d1a] text-xs font-bold px-3 py-1 rounded-full">
-                    Pronostiquer
-                  </span>
-                )}
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <span>{match.awayTeam.name}</span>
+                <div className="shrink-0">
+                  {pred ? (
+                    <div className="bg-[#041629] rounded-lg px-3 py-1 text-sm font-bold text-[#93c5fd] whitespace-nowrap">
+                      {pred.homeScore} — {pred.awayScore}
+                      {pred.points !== null && (
+                        <span className="ml-1 text-xs text-[#fbbf24]">+{pred.points}pts</span>
+                      )}
+                    </div>
+                  ) : isPast ? (
+                    <span className="text-xs text-[#64748b]">Coupure</span>
+                  ) : (
+                    <span className="bg-[#f59e0b] text-[#020d1a] text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                      Pronostiquer
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-sm font-semibold min-w-0 justify-end">
+                  <span className="truncate text-right">{match.awayTeam.name}</span>
+                  <TeamFlag name={match.awayTeam.name} flagUrl={match.awayTeam.flagUrl} size="sm" />
                 </div>
               </div>
             </Link>
