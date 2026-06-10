@@ -5,11 +5,15 @@ import { Prisma } from '@prisma/client'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
+function initVapid() {
+  if (process.env.VAPID_SUBJECT && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT,
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY,
+    )
+  }
+}
 
 interface NotifyPayload {
   userId: string
@@ -70,6 +74,7 @@ export async function sendNotification(payload: NotifyPayload) {
 
   // Push
   if (user.pushSubscription) {
+    initVapid()
     try {
       await webpush.sendNotification(
         user.pushSubscription as any,
