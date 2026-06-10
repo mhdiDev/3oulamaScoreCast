@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export async function POST(req: Request) {
   const session = await auth()
@@ -25,7 +26,7 @@ export async function DELETE(req: Request) {
 
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { pushSubscription: null },
+    data: { pushSubscription: Prisma.JsonNull },
   })
 
   return NextResponse.json({ ok: true })
